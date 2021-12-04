@@ -1,8 +1,10 @@
-import React, { ChangeEvent, FC } from "react";
+import { ChangeEvent, FC } from "react";
 import clsx from "clsx";
 import { FilterValuesType } from "./App";
 import AddItemForm from "./AddItemForm";
 import EditableSpan from "./EditableSpan";
+import { Button, Checkbox, IconButton, Stack } from "@mui/material";
+import { Delete } from "@mui/icons-material";
 
 export type TaskType = {
 	id: string
@@ -37,13 +39,15 @@ export const Todolist: FC<PropsType> = (props) => {
 	const onCompleteClickHandler = () => props.changeFilter("completed", props.id)
 
 	return (
-		<div>
+		<>
 			<h3><EditableSpan value={ props.title } onChange={ changeTodolistTitle } />
-				<button onClick={ removeTodolist }>x</button>
+				<IconButton onClick={ removeTodolist }>
+					<Delete />
+				</IconButton>
 			</h3>
 			<AddItemForm addItem={ addTask } />
 
-			<ul>
+			<div>
 				{ props.tasks.map(task => {
 						const onClickHandler = () => props.removeTask(task.id, props.id)
 						const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
@@ -55,29 +59,35 @@ export const Todolist: FC<PropsType> = (props) => {
 						}
 
 						return (
-							<li key={ task.id } className={ clsx({ 'is-done': task.isDone }) }>
-								<input type="checkbox" checked={ task.isDone } onChange={ onChangeHandler } />
+							<div key={ task.id } className={ clsx({ 'is-done': task.isDone }) }>
+								<Checkbox checked={ task.isDone } onChange={ onChangeHandler } />
 								<EditableSpan value={ task.title } onChange={ onTitleChangeHandler }
 								/>
-								<button onClick={ onClickHandler }>x</button>
-							</li>
+								<IconButton onClick={ onClickHandler }>
+									<Delete />
+								</IconButton>
+							</div>
 						)
 					}
 				) }
-			</ul>
-
-			<div>
-				<button onClick={ onAllClickHandler } className={ clsx({ 'active-filter': props.filter === 'all' }) }
-				>All
-				</button>
-				<button onClick={ onActiveClickHandler } className={ clsx({ 'active-filter': props.filter === 'active' }) }
-				>Active
-				</button>
-				<button onClick={ onCompleteClickHandler }
-								className={ clsx({ 'active-filter': props.filter === 'completed' }) }
-				>Completed
-				</button>
 			</div>
-		</div>
+
+			<Stack direction={ "row" } spacing={ 1 } sx={ { mt: 2 } }>
+				<Button onClick={ onAllClickHandler }
+								variant={ props.filter === 'all' ? 'contained' : 'text' }
+				>All
+				</Button>
+				<Button onClick={ onActiveClickHandler }
+								variant={ props.filter === 'active' ? 'contained' : 'text' }
+								color={ "warning" }
+				>Active
+				</Button>
+				<Button onClick={ onCompleteClickHandler }
+								variant={ props.filter === 'completed' ? 'contained' : 'text' }
+								color={ "success" }
+				>Completed
+				</Button>
+			</Stack>
+		</>
 	)
 }

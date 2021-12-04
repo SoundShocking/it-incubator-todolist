@@ -1,5 +1,6 @@
-import React, { ChangeEvent, FC, KeyboardEvent, useState } from "react";
-import clsx from "clsx";
+import { ChangeEvent, FC, KeyboardEvent, useState } from "react";
+import { IconButton, TextField } from "@mui/material";
+import { AddBox } from "@mui/icons-material";
 
 type AddItemFormType = {
 	addItem: (title: string) => void
@@ -12,6 +13,7 @@ const AddItemForm: FC<AddItemFormType> = (props) => {
 	const addItem = () => {
 		if (title.trim()) {
 			props.addItem(title)
+			setTitle('')
 		} else {
 			setError('title is required')
 		}
@@ -26,20 +28,23 @@ const AddItemForm: FC<AddItemFormType> = (props) => {
 
 		if (e.key === "Enter") {
 			addItem()
-			setTitle('')
 		}
 	}
 
 	return (
 		<div>
-			<input value={ title }
-						 onChange={ onChangeHandler }
-						 onKeyPress={ onKeyPressHandler }
-						 className={ clsx({ 'error': error }) }
+			<TextField value={ title }
+								 onChange={ onChangeHandler }
+								 onKeyPress={ onKeyPressHandler }
+								 variant={ "outlined" }
+								 error={ !!error }
+								 label={ 'Title' }
+								 helperText={ error }
 			/>
-			<button onClick={ addItem }>+</button>
+			<IconButton color={ "primary" } size={ "large" } onClick={ addItem }>
+				<AddBox fontSize={ "inherit" } />
+			</IconButton>
 
-			{ error && <div className="error-message">{ error }</div> }
 		</div>
 	)
 }
