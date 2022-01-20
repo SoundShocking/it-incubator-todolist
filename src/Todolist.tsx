@@ -1,10 +1,10 @@
-import { ChangeEvent, FC } from "react";
-import clsx from "clsx";
+import React, { FC, useCallback } from "react";
 import { FilterValuesType } from "./App";
 import AddItemForm from "./AddItemForm";
 import EditableSpan from "./EditableSpan";
-import { Button, Checkbox, IconButton, Stack } from "@mui/material";
+import { Button, IconButton, Stack } from "@mui/material";
 import { Delete } from "@mui/icons-material";
+import { Task } from "./Task";
 
 export type TaskType = {
 	id: string
@@ -26,21 +26,35 @@ type PropsType = {
 	changeTaskTitle: (taskId: string, newTitle: string, todolistId: string) => void
 }
 
-export const Todolist: FC<PropsType> = (props) => {
-	const addTask = (title: string) => {
+export const Todolist: FC<PropsType> = React.memo((props) => {
+	const addTask = useCallback((title: string) => {
 		props.addTask(title, props.id)
-	}
+	}, [props.addTask, props.id])
 
 	const removeTodolist = () => props.removeTodolist(props.id)
-	const changeTodolistTitle = (title: string) => props.changeTodolistTitle(props.id, title)
+	const changeTodolistTitle = useCallback(
+		(title: string) => props.changeTodolistTitle(props.id, title),
+		[props.id, props.changeTodolistTitle]
+	)
 
-	const onAllClickHandler = () => props.changeFilter("all", props.id)
-	const onActiveClickHandler = () => props.changeFilter("active", props.id)
-	const onCompleteClickHandler = () => props.changeFilter("completed", props.id)
+	const onAllClickHandler = useCallback(() => props.changeFilter("all", props.id), [props.changeFilter, props.id])
+	const onActiveClickHandler = useCallback(() => props.changeFilter("active", props.id), [props.changeFilter, props.id])
+	const onCompleteClickHandler = useCallback(() => props.changeFilter("completed", props.id), [props.changeFilter, props.id])
+
+	let tasksForTodolist = props.tasks
+
+	if (props.filter === 'active') {
+		tasksForTodolist = props.tasks.filter(t => t.isDone === false)
+	}
+	if (props.filter === 'completed') {
+		tasksForTodolist = props.tasks.filter(t => t.isDone === true)
+	}
 
 	return (
 		<>
-			<h3><EditableSpan value={ props.title } onChange={ changeTodolistTitle } />
+			<h3>
+				<EditableSpan value={ props.title } onChange={ changeTodolistTitle } />
+
 				<IconButton onClick={ removeTodolist }>
 					<Delete />
 				</IconButton>
@@ -48,26 +62,11 @@ export const Todolist: FC<PropsType> = (props) => {
 			<AddItemForm addItem={ addTask } />
 
 			<div>
-				{ props.tasks.map(task => {
-						const onClickHandler = () => props.removeTask(task.id, props.id)
-						const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-							const newIsDoneValue = e.currentTarget.checked
-							props.changeTaskStatus(task.id, newIsDoneValue, props.id)
-						}
-						const onTitleChangeHandler = (newValue: string) => {
-							props.changeTaskTitle(task.id, newValue, props.id)
-						}
-
-						return (
-							<div key={ task.id } className={ clsx({ 'is-done': task.isDone }) }>
-								<Checkbox checked={ task.isDone } onChange={ onChangeHandler } />
-								<EditableSpan value={ task.title } onChange={ onTitleChangeHandler }
-								/>
-								<IconButton onClick={ onClickHandler }>
-									<Delete />
-								</IconButton>
-							</div>
-						)
+				{ tasksForTodolist.map(task => {
+						return <Task task={ task } changeTaskStatus={ props.changeTaskStatus }
+												 changeTaskTitle={ props.changeTaskTitle } removeTask={ props.removeTask } todolistId={ props.id }
+												 key={ task.id }
+						/>
 					}
 				) }
 			</div>
@@ -75,19 +74,24 @@ export const Todolist: FC<PropsType> = (props) => {
 			<Stack direction={ "row" } spacing={ 1 } sx={ { mt: 2 } }>
 				<Button onClick={ onAllClickHandler }
 								variant={ props.filter === 'all' ? 'contained' : 'text' }
-				>All
+				>
+					All
 				</Button>
+
 				<Button onClick={ onActiveClickHandler }
 								variant={ props.filter === 'active' ? 'contained' : 'text' }
 								color={ "warning" }
-				>Active
+				>
+					Active
 				</Button>
+
 				<Button onClick={ onCompleteClickHandler }
 								variant={ props.filter === 'completed' ? 'contained' : 'text' }
 								color={ "success" }
-				>Completed
+				>
+					Completed
 				</Button>
 			</Stack>
 		</>
 	)
-}
+})

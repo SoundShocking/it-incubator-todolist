@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback } from 'react';
 import { AppBar, Box, Button, Container, Grid, IconButton, Paper, Toolbar, Typography } from "@mui/material";
 import { Menu as MenuIcon } from "@mui/icons-material";
 import { useDispatch, useSelector } from 'react-redux';
@@ -32,37 +32,37 @@ const App: FC = () => {
 	const tasks = useSelector<AppStateType, TasksStateType>(state => state.tasks)
 	const dispatch = useDispatch()
 
-	const removeTask = (id: string, todolistId: string) => {
+	const removeTask = useCallback((id: string, todolistId: string) => {
 		dispatch(removeTaskAC(id, todolistId))
-	}
+	}, [dispatch])
 
-	const addTask = (title: string, todolistId: string) => {
+	const addTask = useCallback((title: string, todolistId: string) => {
 		dispatch(addTaskAC(title, todolistId))
-	}
+	}, [dispatch])
 
-	const changeStatus = (id: string, isDone: boolean, todolistId: string) => {
+	const changeStatus = useCallback((id: string, isDone: boolean, todolistId: string) => {
 		dispatch(changeTaskStatusAC(id, isDone, todolistId))
-	}
+	}, [dispatch])
 
-	const changeTaskTitle = (id: string, newTitle: string, todolistId: string) => {
+	const changeTaskTitle = useCallback((id: string, newTitle: string, todolistId: string) => {
 		dispatch(changeTaskTitleAC(id, newTitle, todolistId))
-	}
+	}, [dispatch])
 
-	const changeFilter = (value: FilterValuesType, todolistId: string) => {
+	const changeFilter = useCallback((value: FilterValuesType, todolistId: string) => {
 		dispatch(changeTodolistFilterAC(todolistId, value))
-	}
+	}, [dispatch])
 
-	const removeTodolist = (id: string) => {
+	const removeTodolist = useCallback((id: string) => {
 		dispatch(removeTodolistAC(id))
-	}
+	}, [dispatch])
 
-	const addTodolist = (title: string) => {
+	const addTodolist = useCallback((title: string) => {
 		dispatch(addTodolistAC(title))
-	}
+	}, [dispatch])
 
-	const changeTodolistTitle = (id: string, title: string) => {
+	const changeTodolistTitle = useCallback((id: string, title: string) => {
 		dispatch(changeTodolistTitleAC(id, title))
-	}
+	}, [dispatch])
 
 	return (
 		<div className="App">
@@ -93,16 +93,7 @@ const App: FC = () => {
 			<Container sx={ { mt: 3, mb: 3 } }>
 				<Grid container spacing={ 2 }>
 					{ todolists.map(tl => {
-						const allTodolistTasks = tasks[tl.id]
-						let tasksForTodolist = allTodolistTasks;
-
-						if (tl.filter === "active") {
-							tasksForTodolist = allTodolistTasks.filter(task => !task.isDone)
-						}
-
-						if (tl.filter === "completed") {
-							tasksForTodolist = allTodolistTasks.filter(task => task.isDone)
-						}
+						const tasksForTodolist = tasks[tl.id]
 
 						return (
 							<Grid item key={ tl.id } lg={ 4 }>
