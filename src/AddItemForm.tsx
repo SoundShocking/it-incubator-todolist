@@ -2,7 +2,7 @@ import React, { ChangeEvent, FC, KeyboardEvent, useState } from "react";
 import { IconButton, TextField } from "@mui/material";
 import { AddBox } from "@mui/icons-material";
 
-type AddItemFormType = {
+export type AddItemFormType = {
 	addItem: (title: string) => void
 }
 
