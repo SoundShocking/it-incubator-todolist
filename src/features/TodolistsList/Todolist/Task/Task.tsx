@@ -1,14 +1,14 @@
 import React, { ChangeEvent, useCallback } from 'react'
-import { TaskType } from "./Todolist";
+import { TaskStatuses, TaskType } from "../../../../api/todolists-api";
 import clsx from "clsx";
 import { Checkbox, IconButton } from "@mui/material";
-import EditableSpan from "./EditableSpan";
+import EditableSpan from "../../../../components/EditableSpan/EditableSpan";
 import { Delete } from "@mui/icons-material";
 
 type PropsType = {
 	task: TaskType
 	todolistId: string
-	changeTaskStatus: (id: string, isDone: boolean, todolistId: string) => void
+	changeTaskStatus: (id: string, status: TaskStatuses, todolistId: string) => void
 	changeTaskTitle: (taskId: string, newTitle: string, todolistId: string) => void
 	removeTask: (taskId: string, todolistId: string) => void
 }
@@ -18,7 +18,7 @@ export const Task = React.memo((props: PropsType) => {
 
 	const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
 		const newIsDoneValue = e.currentTarget.checked
-		props.changeTaskStatus(props.task.id, newIsDoneValue, props.todolistId)
+		props.changeTaskStatus(props.task.id, newIsDoneValue ? TaskStatuses.Completed : TaskStatuses.New, props.todolistId)
 	}
 
 	const onTitleChangeHandler = useCallback((newValue: string) => {
@@ -26,8 +26,8 @@ export const Task = React.memo((props: PropsType) => {
 	}, [props.task, props.changeTaskTitle, props.todolistId])
 
 	return (
-		<div className={ clsx({ 'is-done': props.task.isDone }) }>
-			<Checkbox checked={ props.task.isDone } onChange={ onChangeHandler } />
+		<div className={ clsx({ 'is-done': props.task.status === TaskStatuses.Completed }) }>
+			<Checkbox checked={ props.task.status === TaskStatuses.Completed } onChange={ onChangeHandler } />
 
 			<EditableSpan value={ props.task.title } onChange={ onTitleChangeHandler } />
 
