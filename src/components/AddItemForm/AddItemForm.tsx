@@ -4,15 +4,16 @@ import { AddBox } from "@mui/icons-material";
 
 export type AddItemFormType = {
 	addItem: (title: string) => void
+	disabled?: boolean
 }
 
-const AddItemForm: FC<AddItemFormType> = React.memo((props) => {
+const AddItemForm: FC<AddItemFormType> = React.memo(({ disabled, addItem }) => {
 	const [title, setTitle] = useState<string>("")
 	const [error, setError] = useState<string | null>(null)
 
-	const addItem = () => {
+	const addItemHandler = () => {
 		if (title.trim()) {
-			props.addItem(title)
+			addItem(title)
 			setTitle('')
 		} else {
 			setError('title is required')
@@ -29,7 +30,7 @@ const AddItemForm: FC<AddItemFormType> = React.memo((props) => {
 		}
 
 		if (e.key === "Enter") {
-			addItem()
+			addItemHandler()
 		}
 	}
 
@@ -42,8 +43,9 @@ const AddItemForm: FC<AddItemFormType> = React.memo((props) => {
 								 error={ !!error }
 								 label={ 'Title' }
 								 helperText={ error }
+								 disabled={ disabled }
 			/>
-			<IconButton color={ "primary" } size={ "large" } onClick={ addItem }>
+			<IconButton color={ "primary" } size={ "large" } onClick={ addItemHandler } disabled={ disabled }>
 				<AddBox fontSize={ "inherit" } />
 			</IconButton>
 
