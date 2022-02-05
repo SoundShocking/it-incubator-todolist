@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppStateType } from "../app/store";
+import { AppRootStateType } from "../../app/store";
 import {
 	addTodolistTC,
 	changeTodolistFilterAC,
@@ -9,19 +9,24 @@ import {
 	FilterValuesType,
 	removeTodolistTC,
 	TodolistDomainType
-} from "./TodolistsList/todolists-reducer";
-import { addTaskTC, removeTaskTC, TasksStateType, updateTaskTC } from "./TodolistsList/tasks-reducer";
-import { TaskStatuses } from "../api/todolists-api";
+} from "./todolists-reducer";
+import { addTaskTC, removeTaskTC, TasksStateType, updateTaskTC } from "./tasks-reducer";
+import { TaskStatuses } from "../../api/todolists-api";
 import { Container, Grid, Paper } from "@mui/material";
-import AddItemForm from "../components/AddItemForm/AddItemForm";
-import { Todolist } from "./TodolistsList/Todolist/Todolist";
+import AddItemForm from "../../components/AddItemForm/AddItemForm";
+import { Todolist } from "./Todolist/Todolist";
+import { Navigate } from "react-router-dom";
 
 export const TodolistsList: React.FC = () => {
-	const todolists = useSelector<AppStateType, TodolistDomainType[]>(state => state.todolists)
-	const tasks = useSelector<AppStateType, TasksStateType>(state => state.tasks)
+	const todolists = useSelector<AppRootStateType, TodolistDomainType[]>(state => state.todolists)
+	const tasks = useSelector<AppRootStateType, TasksStateType>(state => state.tasks)
+	const isLoggedIn = useSelector<AppRootStateType, boolean>(state => state.auth.isLoggedIn)
+
 	const dispatch = useDispatch()
 
 	useEffect(() => {
+		if (!isLoggedIn) return
+
 		const thunk = fetchTodolistsTC()
 		dispatch(thunk)
 	}, [dispatch])
@@ -64,6 +69,10 @@ export const TodolistsList: React.FC = () => {
 		const thunk = addTodolistTC(title)
 		dispatch(thunk)
 	}, [dispatch])
+
+	if (!isLoggedIn) {
+		return <Navigate to={ "/login" } />
+	}
 
 	return <>
 		<Container sx={ { mt: 3 } }>

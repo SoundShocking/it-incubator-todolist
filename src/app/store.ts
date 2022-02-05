@@ -4,13 +4,15 @@ import thunk from "redux-thunk";
 import { tasksReducer } from '../features/TodolistsList/tasks-reducer';
 import { todolistsReducer } from '../features/TodolistsList/todolists-reducer';
 import { appReducer } from "./app-reducer";
+import { authReducer } from "../features/Login/auth-reducer";
 
 const rootReducer = combineReducers({
 	tasks: tasksReducer,
 	todolists: todolistsReducer,
-	app: appReducer
+	app: appReducer,
+	auth: authReducer
 })
 
 export const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)))
 
-export type AppStateType = ReturnType<typeof rootReducer>
+export type AppRootStateType = ReturnType<typeof rootReducer>
