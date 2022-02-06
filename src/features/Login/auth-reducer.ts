@@ -22,12 +22,12 @@ export const setIsLoggedInAC = (value: boolean) => ({ type: 'login/SET-IS-LOGGED
 
 // thunks
 export const loginTC = (data: LoginParamsType) => (dispatch: ThunkDispatch) => {
-	dispatch(setAppStatusAC('loading'))
+	dispatch(setAppStatusAC({ status: 'loading' }))
 	authAPI.login(data)
 		.then(res => {
 			if (res.data.resultCode === 0) {
 				dispatch(setIsLoggedInAC(true))
-				dispatch(setAppStatusAC('succeeded'))
+				dispatch(setAppStatusAC({ status: 'succeeded' }))
 			} else {
 				handleServerAppError(res.data, dispatch)
 			}
@@ -38,12 +38,12 @@ export const loginTC = (data: LoginParamsType) => (dispatch: ThunkDispatch) => {
 }
 
 export const logoutTC = () => (dispatch: Dispatch<ActionsType | SetAppStatusActionType | SetAppErrorActionType>) => {
-	dispatch(setAppStatusAC('loading'))
+	dispatch(setAppStatusAC({ status: 'loading' }))
 	authAPI.logout()
 		.then(res => {
 			if (res.data.resultCode === 0) {
 				dispatch(setIsLoggedInAC(false))
-				dispatch(setAppStatusAC('succeeded'))
+				dispatch(setAppStatusAC({ status: 'succeeded' }))
 			} else {
 				handleServerAppError(res.data, dispatch)
 			}
